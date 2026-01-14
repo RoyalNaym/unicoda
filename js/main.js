@@ -340,7 +340,8 @@ function init() {
     }
 
     // Event Listeners
-    document.getElementById('btn-start').addEventListener('click', () => handleStart(false)); // Manual start = show loader
+    // Start Button: Manual start = show loader, AND resume last session
+    document.getElementById('btn-start').addEventListener('click', () => handleStart(false, true)); 
     dom.buttons.forward.addEventListener('click', goForward);
     dom.buttons.back.addEventListener('click', goBack);
     dom.buttons.random.addEventListener('click', () => {
@@ -350,6 +351,15 @@ function init() {
             goTrueRandom();
         }
     });
+    
+    // Home Button (Return to Title)
+    document.getElementById('nav-home').addEventListener('click', () => {
+        state.activeJourney = null;
+        state.journeyIndex = -1;
+        switchScreen('title');
+        startMainTitleAnimation();
+    });
+
     dom.buttons.fav.addEventListener('click', toggleFavorite);
     dom.buttons.theme.addEventListener('click', toggleThemeMode);
     dom.buttons.backdrop.addEventListener('click', cycleBackdrop);
@@ -360,18 +370,28 @@ function init() {
     dom.buttons.secondsToggle.addEventListener('click', toggleSeconds);
 
     document.getElementById('btn-add-note').addEventListener('click', () => window.AnnotationsSystem.createNote());
+    
+    // List Overlay Buttons
     document.getElementById('btn-lists').addEventListener('click', () => { openLists(); toggleOverlay('lists', true); });
+    document.getElementById('btn-close-lists').addEventListener('click', () => toggleOverlay('lists', false));
+    
+    // Tab Listeners (Fixing the interaction bug)
+    document.getElementById('tab-visited').addEventListener('click', () => switchListTab('visited'));
+    document.getElementById('tab-favorites').addEventListener('click', () => switchListTab('favorites'));
+
     document.getElementById('btn-settings').addEventListener('click', () => toggleOverlay('settings', true));
+    
+    // About Overlay Buttons (With Animation)
     document.getElementById('btn-about').addEventListener('click', () => {
         toggleOverlay('about', true);
-        AboutAnimation.start();
+        if (typeof AboutAnimation !== 'undefined') AboutAnimation.start();
     });
     document.getElementById('btn-close-about').addEventListener('click', () => {
         toggleOverlay('about', false);
-        AboutAnimation.stop();
+        if (typeof AboutAnimation !== 'undefined') AboutAnimation.stop();
     });
+    
     document.getElementById('btn-close-settings').addEventListener('click', () => toggleOverlay('settings', false));
-    document.getElementById('btn-close-lists').addEventListener('click', () => toggleOverlay('lists', false));
 
     document.getElementById('btn-reset-intro').addEventListener('click', () => {
         state.seenIntro = false;
@@ -389,7 +409,7 @@ function init() {
         const target = e.target.closest('[data-tooltip]');
         if (target) {
             const text = target.dataset.tooltip;
-            dom.tooltip.textContent = text;
+            dom.tooltip.innerHTML = text; // Changed to innerHTML to support <br>
             const rect = target.getBoundingClientRect();
             const centerX = rect.left + (rect.width / 2);
             let top;
@@ -416,6 +436,21 @@ function init() {
             dom.tooltip.classList.add('hidden');
         }
     });
+    
+    // Filter Buttons (Ensuring listeners attach)
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.blur(); 
+            const type = btn.dataset.type;
+            const nextState = { ...state.filters, [type]: !state.filters[type] };
+            const anyCoreOn = nextState.barcode || nextState.current || nextState.geode;
+            const journeyOn = nextState.journey;
+            if (!anyCoreOn && !journeyOn) return;
+            state.filters[type] = !state.filters[type];
+            btn.classList.toggle('active', state.filters[type]);
+            localStorage.setItem('unicoda_filters', JSON.stringify(state.filters));
+        });
+    });
 
     // Inputs
     document.addEventListener('keydown', (e) => {
@@ -441,23 +476,23 @@ function init() {
 
     // STARTUP LOGIC
     if (state.newTabMode) {
-        document.title = "New Tab"; // Set title for new tab mode
+        document.title = "New Tab"; 
         handleStart(true); 
         ClockSystem.start(); 
     } else {
-        document.title = "UNICODA"; // Reset title
+        document.title = "UNICODA"; 
         switchScreen('title');
         startMainTitleAnimation();
     }
 }
 
 function updateTextSize(step) {
-    // Range 1-8
-    // Min 1.2, Max 2.6
-    // Step size = (2.6 - 1.2) / 7 = 0.2
+    // OLD: 1.2 to 2.6
+    // NEW: 1.8 to 4.2 vmin
+    // Step size ~0.35
     
     const val = parseInt(step);
-    const vmin = 1.2 + ((val - 1) * 0.2);
+    const vmin = 1.8 + ((val - 1) * 0.35);
     
     document.documentElement.style.setProperty('--font-reading-size', `${vmin}vmin`);
     
@@ -521,9 +556,9 @@ function startMainTitleAnimation() {
     runAnimation();
 }
 
-function handleStart(skipLoader = false) {
+function handleStart(skipLoader = false, shouldResume = false) {
     if (!state.seenIntro) startIntro();
-    else enterReader(skipLoader);
+    else enterReader(skipLoader, shouldResume);
 }
 
 function switchScreen(name) {
@@ -538,19 +573,24 @@ function switchScreen(name) {
     state.view = name;
     
     const randomBtn = dom.buttons.random;
+    const homeBtn = document.getElementById('nav-home'); // Grab ref
+    const app = document.getElementById('app');
     
+    // View Classes
     if(name === 'title') {
-        document.getElementById('app').classList.add('view-title');
+        app.classList.add('view-title');
+        if(homeBtn) homeBtn.classList.add('inactive'); // Optional hook
     } else {
-        document.getElementById('app').classList.remove('view-title');
+        app.classList.remove('view-title');
+        if(homeBtn) homeBtn.classList.remove('inactive');
     }
 
     if (name === 'intro') {
-        document.getElementById('app').classList.add('view-intro');
+        app.classList.add('view-intro');
         randomBtn.textContent = '↠';
         randomBtn.dataset.tooltip = 'Skip Intro';
     } else {
-        document.getElementById('app').classList.remove('view-intro');
+        app.classList.remove('view-intro');
         randomBtn.textContent = '⚄';
         randomBtn.dataset.tooltip = 'Random';
     }
@@ -584,21 +624,18 @@ function updateTheme() {
     updateFavicon();
 }
 
-function updateFavicon() {
+    function updateFavicon() {
     const link = document.getElementById('app-favicon');
     if (!link) return;
 
     // Configuration for Dark vs Light
-    // Dark Mode: Dark Box (#1a1a1a), Light Text (#d4d4d4)
-    // Light Mode: Light Box (#d4d4d4), Dark Text (#1a1a1a)
-    
     const isLight = state.themeMode === 'light';
     const bgColor = isLight ? '%23d4d4d4' : '%231a1a1a';
     const textColor = isLight ? '%231a1a1a' : '%23d4d4d4';
     
     // Centered SVG with dominant-baseline='central'
-    // Shifted x to 29
-    const svg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cstyle%3E text %7B font-family: monospace; font-weight: bold; font-size: 42px; fill: ${textColor}; %7D %3C/style%3E%3Crect width='64' height='64' rx='8' fill='${bgColor}'/%3E%3Ctext x='29' y='32' dominant-baseline='central' text-anchor='middle'%3E❖%3C/text%3E%3C/svg%3E`;
+    // Reverted x to 32 for true mathematical center
+    const svg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cstyle%3E text %7B font-family: monospace; font-weight: bold; font-size: 42px; fill: ${textColor}; %7D %3C/style%3E%3Crect width='64' height='64' rx='8' fill='${bgColor}'/%3E%3Ctext x='32' y='32' dominant-baseline='central' text-anchor='middle'%3E❖%3C/text%3E%3C/svg%3E`;
     
     link.href = svg;
 }
@@ -1035,6 +1072,8 @@ const Scrambler = {
 
 function displayPiece(piece) {
     const display = dom.display;
+
+    localStorage.setItem('unicoda_last_id', piece.id);
     
     // Check AI status
     const isAI = piece.tags && piece.tags.includes('ai');
@@ -1361,9 +1400,16 @@ function finishIntro() {
     enterReader(); 
 }
 
-function enterReader(skipLoader = false) {
+function enterReader(skipLoader = false, shouldResume = false) {
     switchScreen('reader');
-    triggerLoad(true, null, false, skipLoader);
+    
+    // If resuming, try to find last ID. If not found, fallback to random (null).
+    let targetId = null;
+    if (shouldResume) {
+        targetId = localStorage.getItem('unicoda_last_id');
+    }
+
+    triggerLoad(true, targetId, false, skipLoader);
 }
 
 init();

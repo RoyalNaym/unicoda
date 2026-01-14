@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@300;400;700&family=Noto+Sans+Symbols:wght@400;700&family=Noto+Sans+Symbols+2&display=swap" rel="stylesheet">
 
     <!-- Unicoda Favicon (Dynamic) -->
-    <link id="app-favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cstyle%3E text %7B font-family: monospace; font-weight: bold; font-size: 42px; fill: %23d4d4d4; %7D %3C/style%3E%3Crect width='64' height='64' rx='8' fill='%231a1a1a'/%3E%3Ctext x='29' y='32' dominant-baseline='central' text-anchor='middle'%3E❖%3C/text%3E%3C/svg%3E">
+    <link id="app-favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cstyle%3E text %7B font-family: monospace; font-weight: bold; font-size: 42px; fill: %23d4d4d4; %7D %3C/style%3E%3Crect width='64' height='64' rx='8' fill='%231a1a1a'/%3E%3Ctext x='32' y='32' dominant-baseline='central' text-anchor='middle'%3E❖%3C/text%3E%3C/svg%3E">
 
     <link rel="stylesheet" href="css/style.css">
 </head>    
@@ -78,13 +78,15 @@
             </div>
         </div>
 
-        <!-- GLOBAL UI: Top Right (Menus & Note) -->
+    <!-- GLOBAL UI: Top Right (Menus & Note) -->
         <div class="ui-corner top-right" style="display: flex; gap: 1rem; align-items: center;">
              <button id="btn-add-note" class="icon-btn" data-tooltip="Add Note">+</button>
              <span class="separator">|</span>
              <button id="btn-lists" class="icon-btn" data-tooltip="Lists">☰</button>
              <button id="btn-settings" class="icon-btn" data-tooltip="Settings">⚙</button>
-        </div>
+             <span class="separator">|</span>
+             <button id="nav-home" class="icon-btn" data-tooltip="Title<br>Screen">⌂</button>
+            </div>
 
         <!-- PERMANENT CLOCK DISPLAY -->
         <div id="clock-display" class="hidden"></div>
@@ -190,14 +192,15 @@
 
     <!-- GLOBAL UI: Unified Bottom Footer -->
         <footer id="reader-footer">
-            <!-- Left Tools -->
+    <!-- Left Tools -->
             <div class="footer-left">
+                <!-- Home button removed from here -->
                 <button id="toggle-theme" class="icon-btn" data-tooltip="Theme">◑</button>
                 <button id="btn-backdrop" class="icon-btn" data-tooltip="Backdrop Density">▓</button>
                 <span class="separator">|</span>
                 <button id="nav-fav" class="icon-btn" data-tooltip="Favorite">☆</button>
             </div>
-            
+
             <!-- Center Navigation (Hidden on Title Screen via CSS) -->
             <div class="footer-center">
                 <!-- AI Indicator (Symmetric to Skip) -->

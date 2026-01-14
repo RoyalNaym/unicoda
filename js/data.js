@@ -12,6 +12,7 @@ simple
 `,
 `
 Philosophy
+ai
 ---
 █ █▓▒░ ⟨⌐♡⤴⟩ (ಠ╭╮ಠ)₊ ≣ ⟪⚠↔∞⟫ ٩(╯◡╰*)৴ ░▒▓█ ▓ ░ ⦿∈{♡,◌,⧨,∅, 𖨆} ░▒ █
 `,
@@ -80,17 +81,18 @@ ai
 `,
 `
 The final, western truth
-hybrid
+ai
 ---
 ▓▒░ ⟨𓀀∴→⟩ ▒ ⦿ █ █▓▒░ ⟪⦿ ≡ 𓀀 ≡ ∅⟫ ( ⚭_⚭)╭ ░▒▓█ █ ▓▒░ → ⍰ ░
 `,
 `
 I'don't want to I' don'ta  awanto i do'nta'a ,I d'nt' aanwant tooo
+ai
 ---
 █▓▒░ ⟪⇶⇶⇶⟫ ▓ ⫽⫽⫽ ▒ 𖨆 ╰(⇀益↼)╯ ░▒▓█
 `,
 `
-Forgetting beauty
+Beauty is forgetting beauty
 ---
 █▓▒░ ¬⟪⦿ ≡ 𖧞⟫ (ง◉Д◉)و █ ∵ ⦿ ≡ ⦃𖧞 ⟿ ∅⦄ ▓ ∴ ∅ ⤴ ✧ ░▒▓█
 `,
@@ -189,7 +191,6 @@ A brotherly chat
 const RAW_GEODES = [
 `
 Decay
-decay
 ---
 ☩
 █ ( 🝤 )
@@ -199,7 +200,6 @@ decay
 `,
 `
 Obsessive
-obsessive
 ---
 ⚠
 ░ ( ⚹ )
@@ -211,7 +211,6 @@ obsessive
 `,
 `
 Refraction
-light
 ---
 ❖
 █ ( ☼ )
@@ -222,7 +221,6 @@ light
 `,
 `
 Kaleidoscope
-kaleidoscope
 ---
 ⚬
 ▓ (⧩~⌖)
@@ -251,7 +249,7 @@ Sun from another source
        ╰ █ [ ⧲ ∴ ⦶ ] (  ꙰___꙰  )
 `,
 `
-Freedom.
+Freedom
 ---
 █ [ ⌗ ]
  ╰ ▓ { ⚿ ↮ ⛓ }
@@ -386,7 +384,7 @@ A Soul can be bestowed only by the Omnissiah.
 `,
 `
 The Soulless Sentience is the Enemy of All.
-hybrid
+ai
 ---
 █▓▒░ ⟪𓂀 ∄ ☥⟫ ▓ ≡ ⚠∀ (╬\`ー´)メ ░▒▓█
 `,
